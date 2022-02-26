@@ -53,6 +53,12 @@ jobs:
           print(toxenv)
         shell: python
 
-      - name: Run tox
+      - name: Run tox @ Linux
         run: |
           tox
+        if: ${{ runner.os == 'Linux' }}
+      - name: Run tox @ w64
+        run: |
+          "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          tox
+        if: ${{ runner.os == 'Windows' }}
