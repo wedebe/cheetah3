@@ -8,12 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [windows-latest]
         python-version: [2.7]
         include:
-        - os: ubuntu-latest
-          os-name: Linux
-          pip-cache-path: ~/.cache/pip
         - os: windows-latest
           os-name: w32
           pip-cache-path: ~\AppData\Local\pip\Cache
@@ -49,16 +46,15 @@ jobs:
           if os.name == 'posix':
             toxenv += ',py%s-flake8' % pyver
           with open(os.environ['GITHUB_ENV'], 'a') as f:
+            f.write('PYTHON_VERSION='
+            + '.'.join(str(v) for v in sys.version_info[:2])
+            + '\n')  # For run_with_env.cmd
             f.write('TOXENV=' + toxenv + '\n')
           print(toxenv)
         shell: python
 
-      - name: Run tox @ Linux
-        run: |
-          tox
-        if: ${{ runner.os == 'Linux' }}
       - name: Run tox @ w64
         run: |
-          "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          tox
+          devscripts\CI\run_with_env.cmd tox -vvv
+        shell: cmd
         if: ${{ runner.os == 'Windows' }}
